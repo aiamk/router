@@ -330,7 +330,7 @@ class Router
     /**
      * Triggers 404 response
      *
-     * @param string $pattern A route pattern such as /about/system
+     * @param string $match A route pattern such as /about/system
      */
     public function trigger404($match = null){
 
@@ -398,7 +398,7 @@ class Router
       $pattern = preg_replace('/\/{(.*?)}/', '/(.*?)', $pattern);
 
       // we may have a match!
-      return boolval(preg_match_all('#^' . $pattern . '$#', $uri, $matches, PREG_OFFSET_CAPTURE));
+      return boolval(preg_match_all('#^' . $pattern . '$#', $uri, $matches, $flags));
     }
 
     /**
@@ -490,6 +490,8 @@ class Router
                 }
             } catch (\ReflectionException $reflectionException) {
                 // The controller class is not available or the class does not have the method $method
+                /* triggring 404 better than blank page */
+                $this->trigger404();
             }
         }
     }
@@ -532,7 +534,7 @@ class Router
      * Explicilty sets the server base path. To be used when your entry script path differs from your entry URLs.
      * @see https://github.com/bramus/router/issues/82#issuecomment-466956078
      *
-     * @param string
+     * @param string $serverBasePath
      */
     public function setBasePath($serverBasePath)
     {
