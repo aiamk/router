@@ -261,12 +261,12 @@ $router->mount('/movies', function() use ($router) {
 Nesting of subroutes is possible, just define a second `$router->mount()` in the callable that's already contained within a preceding `$router->mount()`.
 
 
-### `Class@Method` calls
+### `Class::Method` calls
 
 We can route to the class action like so:
 
 ```php
-$router->get('/(\d+)', '\App\Controllers\User@showProfile');
+$router->get('/(\d+)', '\App\Controllers\User::showProfile');
 ```
 
 When a request matches the specified route URI, the `showProfile` method on the `User` class will be executed. The defined route parameters will be passed to the class method.
@@ -277,8 +277,8 @@ If most/all of your handling classes are in one and the same namespace, you can 
 
 ```php
 $router->setNamespace('\App\Controllers');
-$router->get('/users/(\d+)', 'User@showProfile');
-$router->get('/cars/(\d+)', 'Car@showProfile');
+$router->get('/users/(\d+)', 'User::showProfile');
+$router->get('/cars/(\d+)', 'Car::showProfile');
 ```
 
 ### Custom 404
@@ -310,7 +310,7 @@ $router->set404('/api(/.*)?', function() {
 Also supported are `Class@Method` callables:
 
 ```php
-$router->set404('\App\Controllers\Error@notFound');
+$router->set404('\App\Controllers\Error::notFound');
 ```
 
 The 404 handler will be executed when no route pattern was matched to the current URL.
