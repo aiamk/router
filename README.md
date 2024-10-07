@@ -29,7 +29,7 @@ Built by Bram(us) Van Damme _([https://www.bram.us](https://www.bram.us))_ and [
 
 ## Prerequisites/Requirements
 
-- PHP 5.3 or greater
+- PHP 8.3 or greater
 - [URL Rewriting](https://gist.github.com/bramus/5332525)
 
 
