@@ -422,9 +422,9 @@ class Router
         }
 
         // If not, check the existence of special parameters
-        elseif (stripos((string) $fn, '@') !== false) {
+        elseif (stripos((string) $fn, '::') !== false) {
             // Explode segments of given route
-            [$controller, $method] = explode('@', (string) $fn);
+            [$controller, $method] = explode('::', (string) $fn);
 
             // Adjust controller class if namespace has been set
             if ($this->getNamespace() !== '') {
