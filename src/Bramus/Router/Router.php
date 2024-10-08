@@ -56,14 +56,14 @@ class Router
      */
     public function before($methods, $pattern, $fn): void
     {
-        $pattern = $this->baseRoute . '/' . trim($pattern, '/');
+        $pattern = $this->baseRoute . '/' . \trim($pattern, '/');
         $pattern = $this->baseRoute !== '' && $this->baseRoute !== '0' ? rtrim($pattern, '/') : $pattern;
 
         if ($methods === '*') {
             $methods = 'GET|POST|PUT|DELETE|OPTIONS|PATCH|HEAD';
         }
 
-        foreach (explode('|', $methods) as $method) {
+        foreach (\explode('|', $methods) as $method) {
             $this->beforeRoutes[$method][] = ['pattern' => $pattern, 'fn' => $fn];
         }
     }
@@ -77,10 +77,10 @@ class Router
      */
     public function match($methods, $pattern, $fn): void
     {
-        $pattern = $this->baseRoute . '/' . trim($pattern, '/');
-        $pattern = $this->baseRoute !== '' && $this->baseRoute !== '0' ? rtrim($pattern, '/') : $pattern;
+        $pattern = $this->baseRoute . '/' . \trim($pattern, '/');
+        $pattern = $this->baseRoute !== '' && $this->baseRoute !== '0' ? \rtrim($pattern, '/') : $pattern;
 
-        foreach (explode('|', $methods) as $method) {
+        foreach (\explode('|', $methods) as $method) {
             $this->afterRoutes[$method][] = ['pattern' => $pattern, 'fn' => $fn];
         }
     }
@@ -177,7 +177,7 @@ class Router
         $this->baseRoute .= $baseRoute;
 
         // Call the callable
-        call_user_func($fn);
+        \call_user_func($fn);
 
         // Restore original base route
         $this->baseRoute = $curBaseRoute;
@@ -196,13 +196,13 @@ class Router
         // If it's a HEAD request override it to being GET and prevent any output, as per HTTP Specification
         // @url http://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html#sec9.4
         if ($_SERVER['REQUEST_METHOD'] == 'HEAD') {
-            ob_start();
+            \ob_start();
             $method = 'GET';
         }
 
         // If it's a POST request, check for a method override header
         elseif ($_SERVER['REQUEST_METHOD'] == 'POST') {
-            $headers = getallheaders();
+            $headers = \getallheaders();
             if (isset($headers['X-HTTP-Method-Override']) && in_array($headers['X-HTTP-Method-Override'], ['PUT', 'DELETE', 'PATCH'])) {
                 $method = $headers['X-HTTP-Method-Override'];
             }
@@ -218,7 +218,7 @@ class Router
      */
     public function setNamespace($namespace): void
     {
-        if (is_string($namespace)) {
+        if (\is_string($namespace)) {
             $this->namespace = $namespace;
         }
     }
@@ -262,13 +262,13 @@ class Router
                 $this->trigger404();
             }
         } // If a route was handled, perform the finish callback (if any)
-        elseif ($callback && is_callable($callback)) {
+        elseif ($callback && \is_callable($callback)) {
             $callback();
         }
 
         // If it originally was a HEAD request, clean up after ourselves by emptying the output buffer
         if ($_SERVER['REQUEST_METHOD'] == 'HEAD') {
-            ob_end_clean();
+            \ob_end_clean();
         }
 
         // Return true if a route was handled, false otherwise
@@ -283,7 +283,7 @@ class Router
      */
     public function set404($match_fn, $fn = null): void
     {
-        if (!is_null($fn)) {
+        if (!\is_null($fn)) {
             $this->notFoundCallback[$match_fn] = $fn;
         } else {
             $this->notFoundCallback['/'] = $match_fn;
@@ -315,18 +315,18 @@ class Router
             if ($is_match) {
 
                 // Rework matches to only contain the matches, not the orig string
-                $matches = array_slice($matches, 1);
+                $matches = \array_slice($matches, 1);
 
                 // Extract the matched URL parameters (and only the parameters)
-                $params = array_map(function ($match, $index) use ($matches): ?string {
+                $params = \array_map(function ($match, $index) use ($matches): ?string {
 
                     // We have a following parameter: take the substring from the current param position until the next one's position (thank you PREG_OFFSET_CAPTURE)
-                    if (isset($matches[$index + 1]) && isset($matches[$index + 1][0]) && is_array($matches[$index + 1][0]) && $matches[$index + 1][0][1] > -1) {
+                    if (isset($matches[$index + 1]) && isset($matches[$index + 1][0]) && \is_array($matches[$index + 1][0]) && $matches[$index + 1][0][1] > -1) {
                         return trim(substr((string) $match[0][0], 0, $matches[$index + 1][0][1] - $match[0][1]), '/');
                     } // We have no following parameters: return the whole lot
 
-                    return isset($match[0][0]) && $match[0][1] != -1 ? trim((string) $match[0][0], '/') : null;
-                }, $matches, array_keys($matches));
+                    return isset($match[0][0]) && $match[0][1] != -1 ? \trim((string) $match[0][0], '/') : null;
+                }, $matches, \array_keys($matches));
 
                 $this->invoke($route_callable);
 
@@ -336,7 +336,7 @@ class Router
         if (($numHandled == 0) && (isset($this->notFoundCallback['/']))) {
             $this->invoke($this->notFoundCallback['/']);
         } elseif ($numHandled == 0) {
-            header($_SERVER['SERVER_PROTOCOL'] . ' 404 Not Found');
+            \header($_SERVER['SERVER_PROTOCOL'] . ' 404 Not Found');
         }
     }
 
@@ -354,10 +354,10 @@ class Router
     private function patternMatches($pattern, string $uri, &$matches, int $flags): bool
     {
         // Replace all curly braces matches {} into word patterns (like Laravel)
-        $pattern = preg_replace('/\/{(.*?)}/', '/(.*?)', (string) $pattern);
+        $pattern = \preg_replace('/\/{(.*?)}/', '/(.*?)', (string) $pattern);
 
         // we may have a match!
-        return boolval(preg_match_all('#^' . $pattern . '$#', $uri, $matches, $flags));
+        return \boolval(\preg_match_all('#^' . $pattern . '$#', $uri, $matches, $flags));
     }
 
     /**
@@ -386,18 +386,18 @@ class Router
             if ($is_match) {
 
                 // Rework matches to only contain the matches, not the orig string
-                $matches = array_slice($matches, 1);
+                $matches = \array_slice($matches, 1);
 
                 // Extract the matched URL parameters (and only the parameters)
-                $params = array_map(function ($match, $index) use ($matches): ?string {
+                $params = \array_map(function ($match, $index) use ($matches): ?string {
 
                     // We have a following parameter: take the substring from the current param position until the next one's position (thank you PREG_OFFSET_CAPTURE)
                     if (isset($matches[$index + 1]) && isset($matches[$index + 1][0]) && is_array($matches[$index + 1][0]) && $matches[$index + 1][0][1] > -1) {
-                        return trim(substr((string) $match[0][0], 0, $matches[$index + 1][0][1] - $match[0][1]), '/');
+                        return \trim(substr((string) $match[0][0], 0, $matches[$index + 1][0][1] - $match[0][1]), '/');
                     } // We have no following parameters: return the whole lot
 
-                    return isset($match[0][0]) && $match[0][1] != -1 ? trim((string) $match[0][0], '/') : null;
-                }, $matches, array_keys($matches));
+                    return isset($match[0][0]) && $match[0][1] != -1 ? \trim((string) $match[0][0], '/') : null;
+                }, $matches, \array_keys($matches));
 
                 // Call the handling function with the URL parameters if the desired input is callable
                 $this->invoke($route['fn'], $params);
@@ -417,14 +417,14 @@ class Router
 
     private function invoke($fn, array $params = []): void
     {
-        if (is_callable($fn)) {
-            call_user_func_array($fn, $params);
+        if (\is_callable($fn)) {
+            \call_user_func_array($fn, $params);
         }
 
         // If not, check the existence of special parameters
-        elseif (stripos((string) $fn, '::') !== false) {
+        elseif (\stripos((string) $fn, '::') !== false) {
             // Explode segments of given route
-            [$controller, $method] = explode('::', (string) $fn);
+            [$controller, $method] = \explode('::', (string) $fn);
 
             // Adjust controller class if namespace has been set
             if ($this->getNamespace() !== '') {
@@ -436,11 +436,11 @@ class Router
                 // Make sure it's callable
                 if ($reflectedMethod->isPublic() && (!$reflectedMethod->isAbstract())) {
                     if ($reflectedMethod->isStatic()) {
-                        forward_static_call_array([$controller, $method], $params);
+                        \forward_static_call_array([$controller, $method], $params);
                     } else {
                         // Make sure we have an instance, because a non-static method must not be called statically
                         $controller = new $controller();
-                        call_user_func_array([$controller, $method], $params);
+                        \call_user_func_array([$controller, $method], $params);
                     }
                 }
             } catch (\ReflectionException) {
@@ -460,15 +460,15 @@ class Router
     public function getCurrentUri(): string
     {
         // Get the current Request URI and remove rewrite base path from it (= allows one to run the router in a sub folder)
-        $uri = substr(rawurldecode((string) $_SERVER['REQUEST_URI']), strlen($this->getBasePath()));
+        $uri = \substr(rawurldecode((string) $_SERVER['REQUEST_URI']), \strlen($this->getBasePath()));
 
         // Don't take query params into account on the URL
         if (strstr($uri, '?')) {
-            $uri = substr($uri, 0, strpos($uri, '?'));
+            $uri = \substr($uri, 0, strpos($uri, '?'));
         }
 
         // Remove trailing slash + enforce a slash at the start
-        return '/' . trim($uri, '/');
+        return '/' . \trim($uri, '/');
     }
 
     /**
@@ -480,7 +480,7 @@ class Router
     {
         // Check if server base path is defined, if not define it.
         if ($this->serverBasePath === null) {
-            $this->serverBasePath = implode('/', array_slice(explode('/', (string) $_SERVER['SCRIPT_NAME']), 0, -1)) . '/';
+            $this->serverBasePath = \implode('/', \array_slice(explode('/', (string) $_SERVER['SCRIPT_NAME']), 0, -1)) . '/';
         }
 
         return $this->serverBasePath;
