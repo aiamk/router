@@ -1,5 +1,5 @@
 # PHP 8.3 Version
-Optimized for PHP 8.3 using phpstan level 5 & rector
+Optimized for PHP 8.3 using phpstan level 9 & rector
 
 # bramus/router
 
