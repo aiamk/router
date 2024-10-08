@@ -266,7 +266,7 @@ class Router
     {
         // Define which method we need to handle
         $this->requestedMethod = $this->getRequestMethod();
-        //ddd($this->afterRoutes[$this->requestedMethod]);
+        
         // Handle all before middlewares
         if (isset($this->beforeRoutes[$this->requestedMethod])) {
             // @phpstan-ignore argument.type
